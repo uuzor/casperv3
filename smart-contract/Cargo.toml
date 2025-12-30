@@ -1,5 +1,5 @@
 [workspace]
-members = ["lottery-cli", "lottery-contracts", "dex-contracts", "plvx"]
+members = ["plvx"]
 exclude = ["smart_contract_client"]
 resolver = "2"
 

@@ -1,2 +1,5 @@
 [[contracts]]
 fqn = "plvx::PremierLeague"
+
+[[contracts]]
+fqn = "plvx::PremierLeagueImproved"

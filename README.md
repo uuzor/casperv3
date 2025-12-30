@@ -1,87 +1,384 @@
-# Lottery Demo dApp
+# 🏆 PLVX - Premier League Virtual Betting Platform
 
-This is an example of a decentralized application (or dApp) built on the [Casper Network](https://casper.network), a layer 1 proof-of-stake (PoS) blockchain. Lottery game logic implemented on-chain aims to demonstrate the value of blockchain, which is the increased trust to the outcome since nobody can manipulate the results.
+A decentralized sports betting platform built on the [Casper Network](https://casper.network), featuring virtual Premier League matches with dynamic odds, NFT team badges, and a native $LEAGUE token.
 
-To participate in the lottery, you need to buy a ticket using the native token of the Casper Network. After collecting a fee, the application puts the proceeds into the prize pool, which is used to reward the players. When somebody wins the jackpot, a new lottery round starts, making the game indefinite. 
+![Casper Network](https://img.shields.io/badge/Casper-Network-red)
+![Odra Framework](https://img.shields.io/badge/Odra-v2.4.0-blue)
+![License](https://img.shields.io/badge/license-Apache%202.0-green)
 
-You can try it by playing the lottery deployed to [Casper Testnet](https://testnet.cspr.live/) at https://lottery-demo.casper.network. Please use the [Faucet](https://testnet.cspr.live/tools/faucet) to obtain the test tokens.
+---
 
-![Lottery Application](docs/images/lottery-application.png)
+## 🎯 Overview
 
-## Toolset
+PLVX (Premier League Virtual Exchange) is a blockchain-based virtual sports betting platform that simulates Premier League football matches. Users can bet on match outcomes, predict season winners, collect NFT team badges, and participate in a fully decentralized betting ecosystem.
 
-This application was created to onboard software engineers to the Casper blockchain and the Web3 architecture in general. Unlike traditional Web2 applications, in Web3, users may interact with blockchain directly. It changes the traditional paradigm of how information flows between users and the application and forces the application to observe the network activity and react correspondingly.
+### Key Features
 
-To ease the integration, this example was developed with the help of higher-level abstractions that address those specific challenges of Web3 development and elevate the developer experience.
+- ⚽ **Virtual Matches**: 10 matches every 15 minutes, 36 turns per season
+- 📊 **Dynamic Odds**: Market-driven odds that adjust based on betting pools
+- 🎟️ **Dual Betting**: Match outcome bets + free season winner predictions
+- 🖼️ **NFT Badges**: Collectible team badges with betting bonuses
+- 💰 **$LEAGUE Token**: Platform token with 30% airdrop to early users
+- 🤖 **Automated Execution**: Keeper system for decentralized match simulation
+- 🔐 **Security**: Cryptographically secure randomness, reentrancy protection, claim tracking
 
-![Casper Development Ecosystem](docs/images/development-ecosystem.png)
+---
 
-- [CSPR.click](https://docs.cspr.click) is a Web3 authentication layer that covers the end-user interaction with the blockchain. It provides integration with all the wallets in the Casper Ecosystem and greets users with a well-known Single-Sign-On like experience
-- [Odra](https://odra.dev/docs/) is a smart contract framework written in Rust that abstracts the chain-specific details behind a familiar OOP interface
-- [CSPR.cloud](https://docs.cspr.cloud) is a middleware layer for the Casper Network. It observes and indexes the network activity and provides access to it via a scalable REST API and real-time WebSocket subscriptions
+## 🏗️ Architecture
 
-## Architecture
+The platform consists of four primary components:
 
-Lottery Demo is a Web that consists of four primary components interacting with each other:
+```
+┌─────────────────────────────────────────────────────────┐
+│                    User Interface                        │
+│  (React + TypeScript + PLVX Integration Components)     │
+└───────────────────┬─────────────────────────────────────┘
+                    │
+┌───────────────────▼─────────────────────────────────────┐
+│                   API Server                             │
+│  (Event Listener + REST API + WebSocket)                │
+└───────────────────┬─────────────────────────────────────┘
+                    │
+┌───────────────────▼─────────────────────────────────────┐
+│              Casper Blockchain                           │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │   PLVX Smart Contract (Rust + Odra)             │   │
+│  │   - Season/Match Management                      │   │
+│  │   - Betting System                               │   │
+│  │   - Dynamic Odds Calculation                     │   │
+│  │   - NFT Badge Marketplace                        │   │
+│  │   - $LEAGUE Token                                │   │
+│  └─────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────┘
+                    │
+┌───────────────────▼─────────────────────────────────────┐
+│              Keeper Bots                                 │
+│  (Automated match execution & result generation)         │
+└─────────────────────────────────────────────────────────┘
+```
 
-- [Smart Contract](smart-contract) runs on the Casper Network and implements the lottery logic
-- [Event Listener](server/src/event-handler.ts) listens to the contract on-chain activity and aggregates it to the database for faster access via the API  
-- [API](server/src/api.ts) reads aggregated on-chain data and serves it to the Web Client. It also acts as a proxy to the CSPR.cloud APIs to make it possible for the Web Client to access CSPR.cloud without exposing the access key
-- [Web Client](client) allows users to play the lottery by directly calling the smart contract and displaying information about past plays. It fetches the lottery data from the API and general blockchain data (e.g. account balance) from CSPR.cloud via the CSPR.cloud proxy endpoints exposed by the API
+---
 
-![Architecture](docs/images/architecture.png)
+## 🚀 Quick Start
 
-Each component's code resides in a corresponding separate directory of this mono-repository. [Event Listener](server/src/event-handler.ts) and [API](server/src/api.ts) are both parts of the [server](server) infrastructure.
+### Prerequisites
 
-## Run
+- Node.js v16+ and npm
+- Rust 1.70+ with `wasm32-unknown-unknown` target
+- Casper CLI tools
+- Docker & Docker Compose (optional)
 
-You can run the demo application using [Docker compose](https://docs.docker.com/compose/install).
+### 1. Clone Repository
 
-First, build the applications:
 ```bash
-docker compose -f infra/local/docker-compose.yaml --project-name lottery build
+git clone https://github.com/uzochukwuV/casperv3.git
+cd casperv3
 ```
 
-Then, run using the following command:
+### 2. Install Dependencies
+
 ```bash
-docker compose -f infra/local/docker-compose.yaml --project-name lottery up -d
+# Install Rust and WASM target
+rustup target add wasm32-unknown-unknown
+
+# Install Node dependencies
+cd client && npm install
+cd ../server && npm install
 ```
 
-There are shortcuts available in the [Makefile](Makefile):
+### 3. Build Smart Contract
+
+```bash
+cd smart-contract/plvx
+cargo odra build -c premier_league_improved
 ```
-make build-demo
-make run-demo
+
+### 4. Deploy to Testnet
+
+See [Deployment Guide](smart-contract/plvx/DEPLOYMENT_GUIDE.md) for detailed instructions.
+
+### 5. Run Development Environment
+
+```bash
+# Start API server
+cd server && npm run dev
+
+# Start frontend (new terminal)
+cd client && npm run dev
 ```
 
-## Develop
+Visit `http://localhost:3000` to see the application.
 
-Please, do the following steps if you want to play with the code, or if you want to use it as a starting point for your own dApp.
+---
 
-### CSPR.build
+## 📦 Project Structure
 
-Register a free [CSPR.build](https://console.cspr.build) account to create CSPR.click and CSPR.cloud access keys.
+```
+casperv3/
+├── smart-contract/
+│   └── plvx/                      # Premier League smart contract
+│       ├── src/
+│       │   ├── premier_league_improved.rs  # Main contract (IMPROVED)
+│       │   └── premier_league.rs           # Original (reference)
+│       ├── tests/
+│       │   └── improved_tests.rs           # Comprehensive tests
+│       ├── IMPROVEMENTS.md                 # Security improvements doc
+│       ├── DEPLOYMENT_GUIDE.md            # Deployment instructions
+│       └── Cargo.toml
+├── client/                        # React frontend
+│   └── src/
+│       ├── components/PLVX/      # UI components
+│       │   ├── MatchCard.tsx
+│       │   ├── LeagueTable.tsx
+│       │   └── UserBets.tsx
+│       └── plvx-integration.ts   # Contract integration utilities
+├── server/                        # Node.js backend
+│   └── src/
+│       ├── event-handler.ts      # Blockchain event listener
+│       └── api.ts                # REST API endpoints
+├── docs/                          # Documentation
+└── README.md                      # This file
+```
 
-### Smart contract
+---
 
-Build and deploy the smart contract to [Casper Testnet](https://testnet.cspr.live) as described [here](smart-contract/README.md#deploy-to-casper-testnet). You can skip this step and use the existing [Testnet smart contract](https://testnet.cspr.live/contract-package/8efc85466cf4054f47eb009b683b611fa63cccd14f074bf78f1e9404dc52a347) package hash `8efc85466cf4054f47eb009b683b611fa63cccd14f074bf78f1e9404dc52a347`, which is already provided in the default configuration.
+## ✅ Security Improvements
 
-If you want to write and test your own smart contracts, check the [smart contract documentation](smart-contract/README.md).
+The improved contract (`premier_league_improved.rs`) addresses critical security issues:
 
-### Server
+### 1. ✅ Cryptographically Secure Randomness
+- **Before**: Predictable pseudo-random using block time
+- **After**: `pseudorandom_bytes()` for unpredictable team pairings and match scores
 
-Follow the [Server instructions](server/README.md) to configure, build, and run the Event Listener and API.
+### 2. ✅ Double-Claim Protection
+- **Before**: No tracking - users could claim prizes multiple times
+- **After**: Claim tracking mapping + reentrancy guards
 
-### Web Client
+### 3. ✅ Dynamic Odds System
+- **Before**: Fixed 2.0x odds for all bets
+- **After**: Market-driven odds (1.1x - 50x) based on betting pool distribution
 
-Follow the [Web Client instructions](client/README.md) to configure, build, and run the application.
+### 4. ✅ Automated Keeper System
+- **Before**: Owner-only match execution
+- **After**: Multi-keeper system for decentralized automation
 
-## About Casper
+### 5. ✅ Reentrancy Protection
+- **Before**: No guards on token transfers
+- **After**: Lock-based protection on all critical functions
 
-[Casper](https://casper.network) is a layer 1 proof-of-stake (PoS) blockchain that prioritizes security and decentralization. Casper was built with developer needs in mind and supports features such as upgradable smart contracts or multi-signature transactions on the protocol level. Casper smart contracts are run in a WASM virtual machine, creating the possibility of using a wider variety of languages for smart contract development.
+See [IMPROVEMENTS.md](smart-contract/plvx/IMPROVEMENTS.md) for detailed analysis.
 
-## Community
+---
 
-Join [Casper Developers](https://t.me/CSPRDevelopers) Telegram channel to connect with other developers.
+## 🎮 How It Works
 
-https://github.com/make-software/casper-wallet-playground.git
+### Season Structure
 
+1. **Season Starts**: 20 Premier League teams, 36 turns total
+2. **Matches Scheduled**: 10 matches per turn, every 15 minutes
+3. **Betting Opens**: Users place bets with dynamic odds
+4. **Match Execution**: Keeper bots simulate matches with secure randomness
+5. **Bet Settlement**: Automatic payout based on match results
+6. **Season End**: Champion declared, winner pool distributed
+
+### Betting Flow
+
+```
+1. User selects match & outcome (Home/Draw/Away)
+2. Contract calculates dynamic odds based on current betting pool
+3. User confirms bet with $LEAGUE tokens
+4. 3-5% house edge deducted
+5. Bet added to pool, odds recalculated for next user
+6. Match executes at scheduled time
+7. User settles bet and receives payout if won
+```
+
+### Dynamic Odds Example
+
+```
+Initial odds: 2.0x (default)
+
+After 70% bet on Home Win:
+- Home Win: 1.4x (popular outcome)
+- Draw: 3.3x (unpopular)
+- Away Win: 3.3x (unpopular)
+
+System ensures: 1.1x ≤ odds ≤ 50x
+```
+
+---
+
+## 🛠️ Technology Stack
+
+### Smart Contract
+- **Language**: Rust
+- **Framework**: [Odra v2.4.0](https://odra.dev)
+- **Blockchain**: Casper Network
+- **Token Standard**: Custom ERC20-like ($LEAGUE)
+
+### Frontend
+- **Framework**: React 18+ with TypeScript
+- **Styling**: Tailwind CSS
+- **Web3**: Casper-JS-SDK
+- **State**: React Hooks + Context
+
+### Backend
+- **Runtime**: Node.js
+- **API**: Express.js
+- **WebSocket**: Socket.io
+- **Database**: PostgreSQL (recommended)
+
+---
+
+## 📊 Smart Contract API
+
+### Main Functions
+
+#### Season Management
+```rust
+pub fn start_season(&mut self)
+pub fn end_season(&mut self, season_id: u32)
+```
+
+#### Betting
+```rust
+pub fn place_bet(&mut self, match_id: u32, predicted_result: MatchResult, amount: U256)
+pub fn settle_bet(&mut self, bet_id: U256)
+pub fn get_current_odds(&self, match_id: u32, predicted_result: MatchResult) -> U256
+```
+
+#### Season Predictions (Free)
+```rust
+pub fn predict_season_winner(&mut self, season_id: u32, team_id: u8)
+pub fn claim_season_prize(&mut self, season_id: u32)
+```
+
+#### NFT Badges
+```rust
+pub fn mint_badge(&mut self, team_id: u8)
+pub fn list_badge(&mut self, token_id: U256, price: U256)
+pub fn buy_badge(&mut self, token_id: U256)
+```
+
+#### Keeper System
+```rust
+pub fn add_keeper(&mut self, keeper: Address)
+pub fn simulate_match(&mut self, match_id: u32)
+```
+
+See [API Documentation](smart-contract/plvx/src/premier_league_improved.rs) for complete reference.
+
+---
+
+## 🧪 Testing
+
+### Run Unit Tests
+
+```bash
+cd smart-contract/plvx
+cargo test
+```
+
+### Run Integration Tests
+
+```bash
+cargo test --test improved_tests
+```
+
+### Test Coverage
+
+- ✅ Keeper authorization
+- ✅ Claim tracking
+- ✅ Dynamic odds calculation
+- ✅ Reentrancy protection
+- ✅ Randomness distribution
+- ✅ Full betting cycle
+
+---
+
+## 📖 Documentation
+
+- [Smart Contract Improvements](smart-contract/plvx/IMPROVEMENTS.md)
+- [Deployment Guide](smart-contract/plvx/DEPLOYMENT_GUIDE.md)
+- [Frontend Integration](client/src/plvx-integration.ts)
+- [API Reference](server/README.md)
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Development Guidelines
+
+- Follow Rust naming conventions
+- Add tests for new features
+- Update documentation
+- Run `cargo fmt` and `cargo clippy`
+
+---
+
+## 🔐 Security
+
+### Reporting Vulnerabilities
+
+Please report security issues to: [security@example.com]
+
+### Security Audit
+
+- [ ] External audit pending
+- [ ] Bug bounty program: TBA
+
+### Best Practices
+
+- Use multi-sig for owner functions
+- Rotate keeper keys regularly
+- Monitor contract events
+- Start with low bet limits
+
+---
+
+## 📜 License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🌐 Links
+
+- **Website**: [Coming Soon]
+- **Testnet Demo**: [Coming Soon]
+- **Documentation**: [docs/](docs/)
+- **Casper Network**: https://casper.network
+- **Odra Framework**: https://odra.dev
+
+---
+
+## 🙏 Acknowledgments
+
+- Built with [Odra](https://odra.dev/) smart contract framework
+- Deployed on [Casper Network](https://casper.network)
+- Inspired by decentralized betting platforms
+- Community support from [Casper Developers](https://t.me/CSPRDevelopers)
+
+---
+
+## 📞 Support
+
+- **Discord**: [Join Our Server]
+- **Telegram**: [Casper Developers](https://t.me/CSPRDevelopers)
+- **GitHub Issues**: [Report Issues](https://github.com/uzochukwuV/casperv3/issues)
+- **Email**: support@example.com
+
+---
+
+**Created with ❤️ for the Casper ecosystem**
+
+**Last Updated**: December 30, 2025
+**Version**: 1.0.0

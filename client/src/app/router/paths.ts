@@ -3,3 +3,4 @@ export const ABOUT_PATH = '/about';
 export const JACKPOTS_PATH = '/jackpots';
 export const JACKPOT_PLAYS_PATH = '/jackpot/:id';
 export const MY_PLAYS_PATH = '/my-plays';
+export const PLVX_PATH = '/plvx';

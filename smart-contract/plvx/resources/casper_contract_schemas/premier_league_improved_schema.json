@@ -1,0 +1,932 @@
+{
+  "casper_contract_schema_version": 1,
+  "toolchain": "rustc 1.85.0-nightly (d117b7f21 2024-12-31)",
+  "authors": [],
+  "repository": null,
+  "homepage": null,
+  "contract_name": "PremierLeagueImproved",
+  "contract_version": "0.1.0",
+  "types": [
+    {
+      "struct": {
+        "name": "Approval",
+        "description": null,
+        "members": [
+          {
+            "name": "owner",
+            "description": null,
+            "ty": "Key"
+          },
+          {
+            "name": "spender",
+            "description": null,
+            "ty": "Key"
+          },
+          {
+            "name": "value",
+            "description": null,
+            "ty": "U256"
+          }
+        ]
+      }
+    },
+    {
+      "struct": {
+        "name": "Bet",
+        "description": null,
+        "members": [
+          {
+            "name": "bet_id",
+            "description": null,
+            "ty": "U256"
+          },
+          {
+            "name": "user",
+            "description": null,
+            "ty": "Key"
+          },
+          {
+            "name": "bet_type",
+            "description": null,
+            "ty": "BetType"
+          },
+          {
+            "name": "predicted_result",
+            "description": null,
+            "ty": "MatchResult"
+          },
+          {
+            "name": "amount",
+            "description": null,
+            "ty": "U256"
+          },
+          {
+            "name": "odds",
+            "description": null,
+            "ty": "U256"
+          },
+          {
+            "name": "is_settled",
+            "description": null,
+            "ty": "Bool"
+          },
+          {
+            "name": "is_won",
+            "description": null,
+            "ty": "Bool"
+          },
+          {
+            "name": "payout",
+            "description": null,
+            "ty": "U256"
+          }
+        ]
+      }
+    },
+    {
+      "struct": {
+        "name": "BettingPool",
+        "description": null,
+        "members": [
+          {
+            "name": "home_win_amount",
+            "description": null,
+            "ty": "U256"
+          },
+          {
+            "name": "draw_amount",
+            "description": null,
+            "ty": "U256"
+          },
+          {
+            "name": "away_win_amount",
+            "description": null,
+            "ty": "U256"
+          },
+          {
+            "name": "total_amount",
+            "description": null,
+            "ty": "U256"
+          }
+        ]
+      }
+    },
+    {
+      "struct": {
+        "name": "Match",
+        "description": null,
+        "members": [
+          {
+            "name": "match_id",
+            "description": null,
+            "ty": "U32"
+          },
+          {
+            "name": "season_id",
+            "description": null,
+            "ty": "U32"
+          },
+          {
+            "name": "turn_number",
+            "description": null,
+            "ty": "U32"
+          },
+          {
+            "name": "home_team_id",
+            "description": null,
+            "ty": "U8"
+          },
+          {
+            "name": "away_team_id",
+            "description": null,
+            "ty": "U8"
+          },
+          {
+            "name": "home_score",
+            "description": null,
+            "ty": "U8"
+          },
+          {
+            "name": "away_score",
+            "description": null,
+            "ty": "U8"
+          },
+          {
+            "name": "result",
+            "description": null,
+            "ty": {
+              "Option": "MatchResult"
+            }
+          },
+          {
+            "name": "start_time",
+            "description": null,
+            "ty": "U64"
+          },
+          {
+            "name": "is_finished",
+            "description": null,
+            "ty": "Bool"
+          }
+        ]
+      }
+    },
+    {
+      "struct": {
+        "name": "OwnershipTransferred",
+        "description": null,
+        "members": [
+          {
+            "name": "previous_owner",
+            "description": null,
+            "ty": {
+              "Option": "Key"
+            }
+          },
+          {
+            "name": "new_owner",
+            "description": null,
+            "ty": {
+              "Option": "Key"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "struct": {
+        "name": "Season",
+        "description": null,
+        "members": [
+          {
+            "name": "season_id",
+            "description": null,
+            "ty": "U32"
+          },
+          {
+            "name": "start_time",
+            "description": null,
+            "ty": "U64"
+          },
+          {
+            "name": "current_turn",
+            "description": null,
+            "ty": "U32"
+          },
+          {
+            "name": "is_active",
+            "description": null,
+            "ty": "Bool"
+          },
+          {
+            "name": "winner_team_id",
+            "description": null,
+            "ty": {
+              "Option": "U8"
+            }
+          },
+          {
+            "name": "total_pool",
+            "description": null,
+            "ty": "U256"
+          },
+          {
+            "name": "season_winner_pool",
+            "description": null,
+            "ty": "U256"
+          }
+        ]
+      }
+    },
+    {
+      "struct": {
+        "name": "TeamBadge",
+        "description": null,
+        "members": [
+          {
+            "name": "token_id",
+            "description": null,
+            "ty": "U256"
+          },
+          {
+            "name": "team_id",
+            "description": null,
+            "ty": "U8"
+          },
+          {
+            "name": "owner",
+            "description": null,
+            "ty": "Key"
+          },
+          {
+            "name": "betting_bonus",
+            "description": null,
+            "ty": "U32"
+          }
+        ]
+      }
+    },
+    {
+      "struct": {
+        "name": "TeamStats",
+        "description": null,
+        "members": [
+          {
+            "name": "team_id",
+            "description": null,
+            "ty": "U8"
+          },
+          {
+            "name": "season_id",
+            "description": null,
+            "ty": "U32"
+          },
+          {
+            "name": "wins",
+            "description": null,
+            "ty": "U32"
+          },
+          {
+            "name": "draws",
+            "description": null,
+            "ty": "U32"
+          },
+          {
+            "name": "losses",
+            "description": null,
+            "ty": "U32"
+          },
+          {
+            "name": "goals_for",
+            "description": null,
+            "ty": "U32"
+          },
+          {
+            "name": "goals_against",
+            "description": null,
+            "ty": "U32"
+          },
+          {
+            "name": "points",
+            "description": null,
+            "ty": "U32"
+          }
+        ]
+      }
+    },
+    {
+      "struct": {
+        "name": "Transfer",
+        "description": null,
+        "members": [
+          {
+            "name": "from",
+            "description": null,
+            "ty": {
+              "Option": "Key"
+            }
+          },
+          {
+            "name": "to",
+            "description": null,
+            "ty": {
+              "Option": "Key"
+            }
+          },
+          {
+            "name": "amount",
+            "description": null,
+            "ty": "U256"
+          }
+        ]
+      }
+    },
+    {
+      "enum": {
+        "name": "BetType",
+        "description": null,
+        "variants": [
+          {
+            "name": "MatchWinner",
+            "description": null,
+            "discriminant": 0,
+            "ty": "U32"
+          },
+          {
+            "name": "SeasonWinner",
+            "description": null,
+            "discriminant": 1,
+            "ty": "U8"
+          }
+        ]
+      }
+    },
+    {
+      "enum": {
+        "name": "MatchResult",
+        "description": null,
+        "variants": [
+          {
+            "name": "HomeWin",
+            "description": null,
+            "discriminant": 0,
+            "ty": "Unit"
+          },
+          {
+            "name": "Draw",
+            "description": null,
+            "discriminant": 1,
+            "ty": "Unit"
+          },
+          {
+            "name": "AwayWin",
+            "description": null,
+            "discriminant": 2,
+            "ty": "Unit"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "name": "CallerNotTheNewOwner",
+      "description": "The caller is not the new owner.",
+      "discriminant": 20002
+    },
+    {
+      "name": "CallerNotTheOwner",
+      "description": "The caller is not the owner.",
+      "discriminant": 20001
+    },
+    {
+      "name": "DecimalsNotSet",
+      "description": "Decimals not set",
+      "discriminant": 30004
+    },
+    {
+      "name": "InsufficientAllowance",
+      "description": "Insufficient allowance",
+      "discriminant": 30001
+    },
+    {
+      "name": "InsufficientBalance",
+      "description": "Insufficient balance",
+      "discriminant": 30000
+    },
+    {
+      "name": "MissingRole",
+      "description": "The role is missing.",
+      "discriminant": 20003
+    },
+    {
+      "name": "NameNotSet",
+      "description": "Name not set",
+      "discriminant": 30002
+    },
+    {
+      "name": "OwnerNotSet",
+      "description": "The owner is not set.",
+      "discriminant": 20000
+    },
+    {
+      "name": "RoleRenounceForAnotherAddress",
+      "description": "The role cannot be renounced for another address.",
+      "discriminant": 20004
+    },
+    {
+      "name": "SymbolNotSet",
+      "description": "Symbol not set",
+      "discriminant": 30003
+    }
+  ],
+  "entry_points": [
+    {
+      "name": "add_keeper",
+      "description": "Add a keeper who can execute matches",
+      "is_mutable": true,
+      "arguments": [
+        {
+          "name": "keeper",
+          "description": null,
+          "ty": "Key",
+          "optional": false
+        }
+      ],
+      "return_ty": "Unit",
+      "is_contract_context": true,
+      "access": "public"
+    },
+    {
+      "name": "remove_keeper",
+      "description": "Remove a keeper",
+      "is_mutable": true,
+      "arguments": [
+        {
+          "name": "keeper",
+          "description": null,
+          "ty": "Key",
+          "optional": false
+        }
+      ],
+      "return_ty": "Unit",
+      "is_contract_context": true,
+      "access": "public"
+    },
+    {
+      "name": "is_keeper",
+      "description": "Check if address is a keeper",
+      "is_mutable": false,
+      "arguments": [
+        {
+          "name": "address",
+          "description": null,
+          "ty": "Key",
+          "optional": false
+        }
+      ],
+      "return_ty": "Bool",
+      "is_contract_context": true,
+      "access": "public"
+    },
+    {
+      "name": "start_season",
+      "description": "Start a new season",
+      "is_mutable": true,
+      "arguments": [],
+      "return_ty": "Unit",
+      "is_contract_context": true,
+      "access": "public"
+    },
+    {
+      "name": "simulate_match",
+      "description": "Simulate and finish a match (can be called by keeper or owner)",
+      "is_mutable": true,
+      "arguments": [
+        {
+          "name": "match_id",
+          "description": null,
+          "ty": "U32",
+          "optional": false
+        }
+      ],
+      "return_ty": "Unit",
+      "is_contract_context": true,
+      "access": "public"
+    },
+    {
+      "name": "place_bet",
+      "description": "Place a bet on a match with reentrancy protection",
+      "is_mutable": true,
+      "arguments": [
+        {
+          "name": "match_id",
+          "description": null,
+          "ty": "U32",
+          "optional": false
+        },
+        {
+          "name": "predicted_result",
+          "description": null,
+          "ty": "MatchResult",
+          "optional": false
+        },
+        {
+          "name": "amount",
+          "description": null,
+          "ty": "U256",
+          "optional": false
+        }
+      ],
+      "return_ty": "Unit",
+      "is_contract_context": true,
+      "access": "public"
+    },
+    {
+      "name": "get_current_odds",
+      "description": "Get current odds for a match outcome",
+      "is_mutable": false,
+      "arguments": [
+        {
+          "name": "match_id",
+          "description": null,
+          "ty": "U32",
+          "optional": false
+        },
+        {
+          "name": "predicted_result",
+          "description": null,
+          "ty": "MatchResult",
+          "optional": false
+        }
+      ],
+      "return_ty": "U256",
+      "is_contract_context": true,
+      "access": "public"
+    },
+    {
+      "name": "get_betting_pool",
+      "description": "Get betting pool for a match",
+      "is_mutable": false,
+      "arguments": [
+        {
+          "name": "match_id",
+          "description": null,
+          "ty": "U32",
+          "optional": false
+        }
+      ],
+      "return_ty": {
+        "Option": "BettingPool"
+      },
+      "is_contract_context": true,
+      "access": "public"
+    },
+    {
+      "name": "settle_bet",
+      "description": "Settle a specific bet",
+      "is_mutable": true,
+      "arguments": [
+        {
+          "name": "bet_id",
+          "description": null,
+          "ty": "U256",
+          "optional": false
+        }
+      ],
+      "return_ty": "Unit",
+      "is_contract_context": true,
+      "access": "public"
+    },
+    {
+      "name": "predict_season_winner",
+      "description": "Predict season winner (free)",
+      "is_mutable": true,
+      "arguments": [
+        {
+          "name": "season_id",
+          "description": null,
+          "ty": "U32",
+          "optional": false
+        },
+        {
+          "name": "team_id",
+          "description": null,
+          "ty": "U8",
+          "optional": false
+        }
+      ],
+      "return_ty": "Unit",
+      "is_contract_context": true,
+      "access": "public"
+    },
+    {
+      "name": "end_season",
+      "description": "End season and declare winner",
+      "is_mutable": true,
+      "arguments": [
+        {
+          "name": "season_id",
+          "description": null,
+          "ty": "U32",
+          "optional": false
+        }
+      ],
+      "return_ty": "Unit",
+      "is_contract_context": true,
+      "access": "public"
+    },
+    {
+      "name": "claim_season_prize",
+      "description": "IMPROVED: Claim season winner prediction prize with double-claim protection",
+      "is_mutable": true,
+      "arguments": [
+        {
+          "name": "season_id",
+          "description": null,
+          "ty": "U32",
+          "optional": false
+        }
+      ],
+      "return_ty": "Unit",
+      "is_contract_context": true,
+      "access": "public"
+    },
+    {
+      "name": "has_claimed_season_prize",
+      "description": "Check if user has claimed season prize",
+      "is_mutable": false,
+      "arguments": [
+        {
+          "name": "season_id",
+          "description": null,
+          "ty": "U32",
+          "optional": false
+        },
+        {
+          "name": "user",
+          "description": null,
+          "ty": "Key",
+          "optional": false
+        }
+      ],
+      "return_ty": "Bool",
+      "is_contract_context": true,
+      "access": "public"
+    },
+    {
+      "name": "mint_badge",
+      "description": "Mint a team badge NFT",
+      "is_mutable": true,
+      "arguments": [
+        {
+          "name": "team_id",
+          "description": null,
+          "ty": "U8",
+          "optional": false
+        }
+      ],
+      "return_ty": "Unit",
+      "is_contract_context": true,
+      "access": "public"
+    },
+    {
+      "name": "list_badge",
+      "description": "List badge for sale",
+      "is_mutable": true,
+      "arguments": [
+        {
+          "name": "token_id",
+          "description": null,
+          "ty": "U256",
+          "optional": false
+        },
+        {
+          "name": "price",
+          "description": null,
+          "ty": "U256",
+          "optional": false
+        }
+      ],
+      "return_ty": "Unit",
+      "is_contract_context": true,
+      "access": "public"
+    },
+    {
+      "name": "buy_badge",
+      "description": "Buy a listed badge",
+      "is_mutable": true,
+      "arguments": [
+        {
+          "name": "token_id",
+          "description": null,
+          "ty": "U256",
+          "optional": false
+        }
+      ],
+      "return_ty": "Unit",
+      "is_contract_context": true,
+      "access": "public"
+    },
+    {
+      "name": "get_season",
+      "description": "",
+      "is_mutable": false,
+      "arguments": [
+        {
+          "name": "season_id",
+          "description": null,
+          "ty": "U32",
+          "optional": false
+        }
+      ],
+      "return_ty": {
+        "Option": "Season"
+      },
+      "is_contract_context": true,
+      "access": "public"
+    },
+    {
+      "name": "get_match",
+      "description": "",
+      "is_mutable": false,
+      "arguments": [
+        {
+          "name": "match_id",
+          "description": null,
+          "ty": "U32",
+          "optional": false
+        }
+      ],
+      "return_ty": {
+        "Option": "Match"
+      },
+      "is_contract_context": true,
+      "access": "public"
+    },
+    {
+      "name": "get_team_stats",
+      "description": "",
+      "is_mutable": false,
+      "arguments": [
+        {
+          "name": "season_id",
+          "description": null,
+          "ty": "U32",
+          "optional": false
+        },
+        {
+          "name": "team_id",
+          "description": null,
+          "ty": "U8",
+          "optional": false
+        }
+      ],
+      "return_ty": {
+        "Option": "TeamStats"
+      },
+      "is_contract_context": true,
+      "access": "public"
+    },
+    {
+      "name": "get_bet",
+      "description": "",
+      "is_mutable": false,
+      "arguments": [
+        {
+          "name": "bet_id",
+          "description": null,
+          "ty": "U256",
+          "optional": false
+        }
+      ],
+      "return_ty": {
+        "Option": "Bet"
+      },
+      "is_contract_context": true,
+      "access": "public"
+    },
+    {
+      "name": "get_user_bets",
+      "description": "",
+      "is_mutable": false,
+      "arguments": [
+        {
+          "name": "user",
+          "description": null,
+          "ty": "Key",
+          "optional": false
+        }
+      ],
+      "return_ty": {
+        "List": "U256"
+      },
+      "is_contract_context": true,
+      "access": "public"
+    },
+    {
+      "name": "get_badge",
+      "description": "",
+      "is_mutable": false,
+      "arguments": [
+        {
+          "name": "token_id",
+          "description": null,
+          "ty": "U256",
+          "optional": false
+        }
+      ],
+      "return_ty": {
+        "Option": "TeamBadge"
+      },
+      "is_contract_context": true,
+      "access": "public"
+    },
+    {
+      "name": "get_house_balance",
+      "description": "",
+      "is_mutable": false,
+      "arguments": [],
+      "return_ty": "U256",
+      "is_contract_context": true,
+      "access": "public"
+    },
+    {
+      "name": "get_keeper_count",
+      "description": "",
+      "is_mutable": false,
+      "arguments": [],
+      "return_ty": "U32",
+      "is_contract_context": true,
+      "access": "public"
+    },
+    {
+      "name": "get_turn_matches",
+      "description": "",
+      "is_mutable": false,
+      "arguments": [
+        {
+          "name": "season_id",
+          "description": null,
+          "ty": "U32",
+          "optional": false
+        },
+        {
+          "name": "turn_number",
+          "description": null,
+          "ty": "U32",
+          "optional": false
+        }
+      ],
+      "return_ty": {
+        "List": "U32"
+      },
+      "is_contract_context": true,
+      "access": "public"
+    }
+  ],
+  "events": [
+    {
+      "name": "Approval",
+      "ty": "Approval"
+    },
+    {
+      "name": "OwnershipTransferred",
+      "ty": "OwnershipTransferred"
+    },
+    {
+      "name": "Transfer",
+      "ty": "Transfer"
+    }
+  ],
+  "call": {
+    "wasm_file_name": "PremierLeagueImproved.wasm",
+    "description": "Initialize the contract",
+    "arguments": [
+      {
+        "name": "odra_cfg_package_hash_key_name",
+        "description": "The arg name for the package hash key name.",
+        "ty": "String",
+        "optional": false
+      },
+      {
+        "name": "odra_cfg_allow_key_override",
+        "description": "If true and the key specified in odra_cfg_package_hash_key_name already exists, it will be overwritten.",
+        "ty": "Bool",
+        "optional": false
+      },
+      {
+        "name": "odra_cfg_is_upgradable",
+        "description": "The arg name for the contract upgradeability setting.",
+        "ty": "Bool",
+        "optional": false
+      },
+      {
+        "name": "odra_cfg_is_upgrade",
+        "description": "The arg name for telling the installer that the contract is being upgraded.",
+        "ty": "Bool",
+        "optional": false
+      }
+    ]
+  }
+}

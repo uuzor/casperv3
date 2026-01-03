@@ -1,42 +1,73 @@
-# Lottery Demo dApp Client
+# Tip the Barista - Web Client
 
-Casper Lottery Client is a Web application that allows users to play the lottery and see past plays. It is a React application bootstrapped from [CSPR.click React template](https://www.npmjs.com/package/@make-software/cra-template-csprclick-react). To read more about CSPR.click, please check [the documentation](https://docs.cspr.click).
+A modern React 18 frontend application that provides an intuitive interface for tipping developers on the Casper blockchain. Built with the CSPR.click authentication system and CSPR Design System components.
 
-## Setup
 
-Before building and running the Web Client, please update the configuration. Start with copying the config template:
+## Prerequisites
 
-```bash
-cp public/config.js.local public/config.js
-```
+- **Node.js**: Version 18.x or higher (for optimal React 18 support)
+- **npm**: Version 9.x or higher (or yarn/pnpm)
+- **Backend Server**: API server must be running (see [server README](../server/README.md))
+- **CSPR.click App ID**: Register your app at [CSPR.build Console](https://console.cspr.build)
+- **Casper Wallet**: Users need a compatible wallet ([Casper Wallet](https://www.casperwallet.io/), [Ledger](https://www.ledger.com/), etc.)
 
-Next, update the following configuration values:
+## Configuration
 
-1. Change `lottery_app_contract_package_hash` if you deployed your own contract. If you want to use the [demo application](https://lottery-demo.casper.network) contract, keep the default value.
-2. Change `cspr_click_app_id` to your CSPR.click App ID from [CSPR.build Console](https://console.cspr.build)
+Before building and running the client application, please update the configuration in `public/config.js` to match your environment.
 
-The rest of the values should remain the same for the local development, unless you made corresponding changes in other places.
+1. Change `donation_contract_package_hash` if you deployed your own contract. If you want to use the donation smart contract deployed on testnet, keep the default value.
+2. Change `cspr_click_app_id` to your CSPR.click application id obtained from [CSPR.build Console](https://console.cspr.build).
 
-To install the dependencies, run:
+The rest of the configuration values can be left as is most of the time.
+
+
+## Installation
+
+Install all dependencies:
 
 ```bash
 npm install
 ```
 
-## Build
+This installs React, CSPR.click UI components, Casper JS SDK, and all required libraries.
 
-To build the project for production, run:
+## Development
 
-```bash
-npm run build
-```
-
-This command will create a build folder with optimized production-ready files.
-
-## Run
-
-To run the application, execute:
+### Start Development Server
 
 ```bash
-npm start
+npm run start
 ```
+
+The application will be available at:
+- **Local**: `http://localhost:3000`
+
+
+### Development Workflow
+
+1. **Start Backend Services** (if not already running):
+   ```bash
+   cd ../server
+   npm run api:dev        # Terminal 1
+   npm run event-handler:dev  # Terminal 2
+   ```
+
+2. **Start Frontend**:
+   ```bash
+   cd ../client
+   npm run start            # Terminal 3
+   ```
+
+3. **Open Browser**: Navigate to `http://localhost:3000`
+
+
+## Resources
+
+- **CSPR.click Documentation**: [https://docs.cspr.click](https://docs.cspr.click)
+- **CSPR Design System**: [https://cspr.design/](https://cspr.design/)
+- **Casper JS SDK**: [https://github.com/casper-ecosystem/casper-js-sdk](https://github.com/casper-ecosystem/casper-js-sdk)
+- **React Documentation**: [https://react.dev](https://react.dev)
+- **Vite Documentation**: [https://vitejs.dev](https://vitejs.dev)
+
+## Community & Support
+Join [Casper Developers](https://t.me/CSPRDevelopers) Telegram channel to connect with other developers.

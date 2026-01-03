@@ -36,12 +36,19 @@ interface FindPlaysByRoundParams {
 }
 
 async function main() {
-  // await AppDataSource.initialize();
+  await AppDataSource.initialize();
 
-  // const playsRepository = new PlayRepository(AppDataSource);
-  // const roundsRepository = new RoundRepository(AppDataSource);
+  const playsRepository = new PlayRepository(AppDataSource);
+  const roundsRepository = new RoundRepository(AppDataSource);
 
   const csprCloudClient = new CSPRCloudAPIClient(config.csprCloudApiUrl, config.csprCloudAccessKey);
+
+  // Initialize Premier League repositories
+  const seasonRepository = new (await import('./repository/season')).SeasonRepository(AppDataSource);
+  const matchRepository = new (await import('./repository/match')).MatchRepository(AppDataSource);
+  const betRepository = new (await import('./repository/bet')).BetRepository(AppDataSource);
+  const badgeRepository = new (await import('./repository/badge')).BadgeRepository(AppDataSource);
+  const keeperRepository = new (await import('./repository/keeper')).KeeperRepository(AppDataSource);
 
   // Initialize DEX services
   const poolDeploymentService = new PoolDeploymentService();
@@ -55,69 +62,196 @@ async function main() {
   });
   app.get('/accounts/:account_hash', csprCloudAPIProxy);
 
-  // app.get('/players/:player_account_hash/plays', pagination(), async (req: Request<FindPlaysByPlayerParams, never, never, PaginationParams>, res: Response) => {
-  //   const [plays, total] = await playsRepository.getPaginatedPlays({
-  //     playerAccountHash: req.params.player_account_hash,
-  //   },{
-  //     limit: req.query.limit,
-  //     offset: req.query.offset,
-  //   });
+  app.get('/players/:player_account_hash/plays', pagination(), async (req: Request<FindPlaysByPlayerParams, never, never, PaginationParams>, res: Response) => {
+    try {
+      const [plays, total] = await playsRepository.getPaginatedPlays({
+        playerAccountHash: req.params.player_account_hash,
+      },{
+        limit: req.query.limit,
+        offset: req.query.offset,
+      });
 
-  //   await csprCloudClient.withPublicKeys(plays);
+      await csprCloudClient.withPublicKeys(plays as any);
 
-  //   res.json({ data: plays, total });
-  // });
+      res.json({ data: plays, total });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
 
-  // app.get('/rounds/latest/plays', pagination(), async (req: Request<never, never, never, PaginationParams>, res: Response) => {
-  //   const [plays, total] = await playsRepository.getLatestRoundPlays({
-  //     limit: req.query.limit,
-  //     offset: req.query.offset,
-  //   });
+  app.get('/rounds/latest/plays', pagination(), async (req: Request<never, never, never, PaginationParams>, res: Response) => {
+    try {
+      const [plays, total] = await playsRepository.getLatestRoundPlays({
+        limit: req.query.limit,
+        offset: req.query.offset,
+      });
 
-  //   await csprCloudClient.withPublicKeys(plays);
+      await csprCloudClient.withPublicKeys(plays as any);
 
-  //   res.json({ data: plays, total });
-  // });
+      res.json({ data: plays, total });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
 
-  // app.get('/rounds/:round_id/plays', pagination(), async (req: Request<FindPlaysByRoundParams, never, never, PaginationParams>, res: Response) => {
-  //   const [plays, total] = await playsRepository.getPaginatedPlays({
-  //     roundId: req.params.round_id,
-  //   },{
-  //     limit: req.query.limit,
-  //     offset: req.query.offset,
-  //   });
+  app.get('/rounds/:round_id/plays', pagination(), async (req: Request<FindPlaysByRoundParams, never, never, PaginationParams>, res: Response) => {
+    try {
+      const [plays, total] = await playsRepository.getPaginatedPlays({
+        roundId: req.params.round_id,
+      },{
+        limit: req.query.limit,
+        offset: req.query.offset,
+      });
 
-  //   await csprCloudClient.withPublicKeys(plays);
+      await csprCloudClient.withPublicKeys(plays as any);
 
-  //   res.json({ data: plays, total });
-  // });
+      res.json({ data: plays, total });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
 
-  // app.get('/rounds/latest', async (req: Request<never, never, never, { is_finished: string }>, res: Response) => {
-  //   const isFinished = req.query.is_finished === 'true';
+  app.get('/rounds/latest', async (req: Request<never, never, never, { is_finished: string }>, res: Response) => {
+    try {
+      const isFinished = req.query.is_finished === 'true';
 
-  //   const round = await roundsRepository.getLatest({ isFinished });
+      const round = await roundsRepository.getLatest({ isFinished });
 
-  //   await csprCloudClient.withPublicKeys([round]);
+      if (round) {
+        await csprCloudClient.withPublicKeys([round as any]);
+      }
 
-  //   res.json({ data: round });
-  // });
+      res.json({ data: round });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
 
-  // app.get('/rounds', pagination(), async (req: Request<never, never, never, PaginationParams & { is_finished: string }>, res: Response) => {
-  //   const isFinished = req.query.is_finished === 'true';
-  
-  //   const [rounds, total] = await roundsRepository.getPaginatedRounds({
-  //     limit: req.query.limit,
-  //     offset: req.query.offset,
-  //   }, { isFinished });
+  app.get('/rounds', pagination(), async (req: Request<never, never, never, PaginationParams & { is_finished: string }>, res: Response) => {
+    try {
+      const isFinished = req.query.is_finished === 'true';
 
-  //   await csprCloudClient.withPublicKeys(rounds);
+      const [rounds, total] = await roundsRepository.getPaginatedRounds({
+        limit: req.query.limit,
+        offset: req.query.offset,
+      }, { isFinished });
 
-  //   res.json({ data: rounds, total });
-  // });
+      await csprCloudClient.withPublicKeys(rounds as any);
+
+      res.json({ data: rounds, total });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
 
   app.get('/proxy-wasm', async (_: Request, res: Response) => {
     fs.createReadStream(path.resolve(__dirname, `./resources/proxy_caller.wasm`)).pipe(res);
   });
+
+  // PLVX Contract WASM endpoint
+  app.get('/plvx-wasm', async (_: Request, res: Response) => {
+    try {
+      const wasmPath = path.resolve(__dirname, '../../smart-contract/plvx/wasm/PremierLeagueImproved.wasm');
+
+      if (!fs.existsSync(wasmPath)) {
+        return res.status(404).json({
+          error: 'PremierLeagueImproved.wasm not found. Build the contract first.',
+        });
+      }
+
+      res.setHeader('Content-Type', 'application/wasm');
+      res.setHeader('Content-Disposition', 'attachment; filename=PremierLeagueImproved.wasm');
+      fs.createReadStream(wasmPath).pipe(res);
+    } catch (error: any) {
+      return res.status(500).json({
+        error: error.message,
+      });
+    }
+  });
+
+  // =================== PREMIER LEAGUE ENDPOINTS ===================
+
+  app.get('/premier/seasons', async (_: Request, res: Response) => {
+    try {
+      const seasons = await seasonRepository.findAll();
+      res.json({ data: seasons });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.get('/premier/seasons/:season_id', async (req: Request, res: Response) => {
+    try {
+      const season = await seasonRepository.findById(Number(req.params.season_id));
+      if (!season) return res.status(404).json({ error: 'Season not found' });
+      res.json({ data: season });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.get('/premier/matches', async (req: Request, res: Response) => {
+    try {
+      const seasonId = req.query.seasonId ? Number(req.query.seasonId) : undefined;
+      const turnNumber = req.query.turnNumber ? Number(req.query.turnNumber) : undefined;
+
+      const matches = await matchRepository.findByFilters({ seasonId, turnNumber });
+      res.json({ data: matches });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.get('/premier/matches/:match_id', async (req: Request, res: Response) => {
+    try {
+      const match = await matchRepository.findById(Number(req.params.match_id));
+      if (!match) return res.status(404).json({ error: 'Match not found' });
+      res.json({ data: match });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.get('/premier/matches/:match_id/bets', async (req: Request, res: Response) => {
+    try {
+      const bets = await betRepository.findByMatch(Number(req.params.match_id));
+      res.json({ data: bets });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.get('/premier/bets/:bet_id', async (req: Request, res: Response) => {
+    try {
+      const bet = await betRepository.findById(String(req.params.bet_id));
+      if (!bet) return res.status(404).json({ error: 'Bet not found' });
+      res.json({ data: bet });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.get('/premier/badges/:token_id', async (req: Request, res: Response) => {
+    try {
+      const badge = await badgeRepository.findById(String(req.params.token_id));
+      if (!badge) return res.status(404).json({ error: 'Badge not found' });
+      res.json({ data: badge });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.get('/premier/keepers', async (_: Request, res: Response) => {
+    try {
+      const keepers = await keeperRepository.findAll();
+      res.json({ data: keepers });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // TODO: Add write endpoints (place_bet / simulate_match / settle_batch) when node signing key or keeper workflow is configured
+
 
   // ============================================================================
   // DEX API ENDPOINTS

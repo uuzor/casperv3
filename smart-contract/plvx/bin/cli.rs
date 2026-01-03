@@ -1,13 +1,20 @@
 //! Premier League Virtual Betting Game - Command Line Interface
+//!
+//! IMPROVED VERSION with security enhancements:
+//! - Reentrancy protection
+//! - Keeper system for automated match execution
+//! - Dynamic odds based on betting pools
+//! - Double-claim protection
+//! - Cryptographically secure randomness
 
-use plvx::premier_league::PremierLeague;
+use plvx::premier_league_improved::PremierLeagueImproved;
 use odra::{
     host::{Deployer, HostEnv, NoArgs},
     prelude::Addressable,
 };
 use odra_cli::OdraCli;
 
-/// Deploy script for the Premier League betting game
+/// Deploy script for the Premier League betting game (Improved Version)
 pub struct DeployPremierLeagueScript;
 
 impl odra_cli::deploy::DeployScript for DeployPremierLeagueScript {
@@ -16,14 +23,14 @@ impl odra_cli::deploy::DeployScript for DeployPremierLeagueScript {
         env: &HostEnv,
         container: &mut odra_cli::DeployedContractsContainer,
     ) -> Result<(), odra_cli::deploy::Error> {
-        println!("\n⚽ Deploying Premier League Virtual Betting Game...\n");
+        println!("\n⚽ Deploying Premier League Virtual Betting Game (IMPROVED VERSION)...\n");
 
-        // Deploy PremierLeague contract
-        println!("1️⃣  Deploying PremierLeague contract...");
+        // Deploy PremierLeagueImproved contract
+        println!("1️⃣  Deploying PremierLeagueImproved contract...");
         env.set_gas(500_000_000_000);
-        let premier_league = PremierLeague::try_deploy(env, NoArgs)?;
+        let premier_league = PremierLeagueImproved::try_deploy(env, NoArgs)?;
         container.add_contract(&premier_league)?;
-        println!("   ✅ PremierLeague deployed at: {:?}\n", premier_league.address());
+        println!("   ✅ PremierLeagueImproved deployed at: {:?}\n", premier_league.address());
 
         println!("💰 Contract Features:");
         println!("   • $LEAGUE Token: 100M supply (30% airdrop pool)");
@@ -35,6 +42,13 @@ impl odra_cli::deploy::DeployScript for DeployPremierLeagueScript {
         println!("   • House edge: 4% (configurable 3-5%)");
         println!("   • Marketplace fee: 2.5%\n");
 
+        println!("🔒 Security Features:");
+        println!("   • Reentrancy protection on critical functions");
+        println!("   • Keeper system for automated match execution");
+        println!("   • Dynamic odds based on betting pool distribution");
+        println!("   • Double-claim protection for season prizes");
+        println!("   • Improved randomness using pseudorandom_bytes()\n");
+
         println!("✨ Deployment complete!\n");
         Ok(())
     }
@@ -43,9 +57,9 @@ impl odra_cli::deploy::DeployScript for DeployPremierLeagueScript {
 /// Main CLI entry point
 pub fn main() {
     OdraCli::new()
-        .about("Premier League Virtual Betting Game - Command Line Interface")
+        .about("Premier League Virtual Betting Game - Command Line Interface (IMPROVED)")
         .deploy(DeployPremierLeagueScript)
-        .contract::<PremierLeague>()
+        .contract::<PremierLeagueImproved>()
         .build()
         .run();
 }

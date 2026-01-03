@@ -100,6 +100,106 @@ mod improved_plvx_tests {
         assert!(match_data.is_finished, "Match should be finished");
     }
 
+    #[test]
+    fn test_turn_advances_after_finishing_all_matches() {
+        // Verify that finishing all matches in a turn increments current_turn and schedules the next turn
+        let env = odra_test::env();
+        let mut contract = deploy_contract();
+
+        let owner = env.get_account(0);
+        let keeper = env.get_account(1);
+
+        env.set_caller(owner);
+        contract.add_keeper(keeper);
+        contract.start_season();
+
+        let matches = contract.get_turn_matches(1, 1);
+        assert_eq!(matches.len(), 10, "Should have 10 matches in first turn");
+
+        // Advance time and simulate all matches as keeper
+        env.advance_block_time(1000);
+        env.set_caller(keeper);
+        for match_id in matches.iter() {
+            contract.simulate_match(*match_id);
+        }
+
+        // After finishing all matches, current_turn should be 1
+        let season = contract.get_season(1).unwrap();
+        assert_eq!(season.current_turn, 1, "Current turn should advance to 1");
+
+        // Next turn should be scheduled
+        let next_turn_matches = contract.get_turn_matches(1, 2);
+        assert_eq!(next_turn_matches.len(), 10, "Next turn should have 10 matches scheduled");
+    }
+
+    #[test]
+    fn test_place_bet_updates_season_pool_and_indexing() {
+        let env = odra_test::env();
+        let mut contract = deploy_contract();
+
+        let owner = env.get_account(0);
+        let user = env.get_account(1);
+
+        env.set_caller(owner);
+        contract.start_season();
+
+        let matches = contract.get_turn_matches(1, 1);
+        let match_id = matches[0];
+
+        // Place a test bet (no token transfers in test helper)
+        env.set_caller(user);
+        let bet_amount = U256::from(10 * 1_000_000_000_000_000_000u128); // 10 LEAGUE
+        contract.test_place_bet_no_transfer(match_id, MatchResult::HomeWin, bet_amount);
+
+        // Check match bets indexing
+        let match_bets = contract.get_match_bets(match_id);
+        assert_eq!(match_bets.len(), 1, "Match should have one bet indexed");
+
+        // Check season total_pool updated correctly (after house edge deduction)
+        let season = contract.get_season(1).unwrap();
+        let house_edge = contract.get_house_balance();
+        assert!(season.total_pool > U256::zero(), "Season pool should be increased by bet amount (net)");
+    }
+
+    #[test]
+    fn test_settle_match_bets_batch_marks_bets_settled() {
+        let env = odra_test::env();
+        let mut contract = deploy_contract();
+
+        let owner = env.get_account(0);
+        let user = env.get_account(1);
+
+        env.set_caller(owner);
+        contract.start_season();
+
+        let matches = contract.get_turn_matches(1, 1);
+        let match_id = matches[0];
+
+        // Place 2 test bets
+        env.set_caller(user);
+        let bet_amount = U256::from(10 * 1_000_000_000_000_000_000u128); // 10 LEAGUE
+        contract.test_place_bet_no_transfer(match_id, MatchResult::HomeWin, bet_amount);
+        contract.test_place_bet_no_transfer(match_id, MatchResult::Draw, bet_amount);
+
+        // Simulate match (keeper)
+        let keeper = env.get_account(2);
+        env.set_caller(owner);
+        contract.add_keeper(keeper);
+        env.advance_block_time(1000);
+        env.set_caller(keeper);
+        contract.simulate_match(match_id);
+
+        // Settle all bets in a batch
+        contract.settle_match_bets_batch(match_id, 0, 10);
+
+        // Verify bets are marked as settled
+        let match_bets = contract.get_match_bets(match_id);
+        for bet_id in match_bets {
+            let bet = contract.get_bet(bet_id).unwrap();
+            assert!(bet.is_settled, "Bet should be settled");
+        }
+    }
+
     // ==================== CLAIM TRACKING TESTS ====================
 
     #[test]

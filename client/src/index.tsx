@@ -4,28 +4,22 @@ import './index.css';
 import { ClickProvider } from '@make-software/csprclick-ui';
 import { CONTENT_MODE, CsprClickInitOptions } from '@make-software/csprclick-core-types';
 import App from './App';
+import ReactModal from 'react-modal';
 
 const clickOptions: CsprClickInitOptions = {
-	appName: config.cspr_click_app_name,
-	contentMode: CONTENT_MODE.IFRAME,
-	providers: [
-		'casper-wallet',
-		'ledger',
-		'torus-wallet',
-		'casperdash',
-		'metamask-snap',
-		'casper-signer',
-	],
-	appId: config.cspr_click_app_id,
+  appName: config.cspr_click_app_name,
+  appId: config.cspr_click_app_id,
+  contentMode: CONTENT_MODE.IFRAME,
+  providers: config.cspr_click_providers
 };
 
-const root = ReactDOM.createRoot(
-	document.getElementById('root') as HTMLElement
-);
+ReactModal.setAppElement('#root');
+
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
-	<React.StrictMode>
-		<ClickProvider options={clickOptions}>
-			<App />
-		</ClickProvider>
-	</React.StrictMode>
+  <React.StrictMode>
+    <ClickProvider options={clickOptions}>
+      <App />
+    </ClickProvider>
+  </React.StrictMode>
 );

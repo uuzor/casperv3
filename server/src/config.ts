@@ -9,6 +9,7 @@ interface Config {
   csprCloudStreamingUrl: string;
   csprCloudAccessKey: string;
   lotteryContractPackageHash: string;
+  premierContractPackageHash: string;
   dbURI: string;
   clientURL: string[];
   pingCheckIntervalInMilliseconds: number;
@@ -20,6 +21,7 @@ export const config: Config = {
   csprCloudStreamingUrl: process.env.CSPR_CLOUD_STREAMING_URL as string,
   csprCloudAccessKey: process.env.CSPR_CLOUD_ACCESS_KEY as string,
   lotteryContractPackageHash: process.env.LOTTERY_CONTRACT_PACKAGE_HASH as string,
+  premierContractPackageHash: process.env.PREMIER_CONTRACT_PACKAGE_HASH as string,
   dbURI: process.env.DB_URI as string,
   clientURL: process.env.CLIENT_URL ? (process.env.CLIENT_URL as string).split(',') : [],
   pingCheckIntervalInMilliseconds: 60000,

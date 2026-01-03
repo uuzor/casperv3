@@ -28,7 +28,7 @@ interface AccountHashGatter {
 }
 
 interface PublicKeySetter {
-  setPublicKey(publicKey: string): void;
+  setPublicKey(publicKey: string | null): void;
 }
 
 export class CSPRCloudAPIClient {
@@ -42,7 +42,17 @@ export class CSPRCloudAPIClient {
   }
 
   async getAccounts(params: GetAccountsParams): Promise<PaginatedResponse<Account[]>> {
-    const query = new URLSearchParams(params as Record<string, string>);
+    const query = new URLSearchParams();
+
+    for (const [key, value] of Object.entries(params)) {
+      if (Array.isArray(value)) {
+        for (const v of value) {
+          query.append(key, String(v));
+        }
+      } else if (typeof value !== 'undefined') {
+        query.append(key, String(value));
+      }
+    }
 
     const response = await this.client.get<PaginatedResponse<Account[]>>(`/accounts?${query.toString()}`);
 

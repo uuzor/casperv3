@@ -1,14 +1,3 @@
-[[contracts]]
-fqn = "lottery_contracts::Lottery"
-
-[[contracts]]
-fqn = "dex_contracts::pool::Pool"
-
-[[contracts]]
-fqn = "dex_contracts::factory::Factory"
-
-[[contracts]]
-fqn = "dex_contracts::position_manager::PositionManager"
 
 [[contracts]]
 fqn = "plvx::PremierLeague"

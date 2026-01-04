@@ -21,7 +21,6 @@ import { BetRepository } from './repository/bet';
 import { BadgeRepository } from './repository/badge';
 import { KeeperRepository } from './repository/keeper';
 
-import { AppDataSource } from './data-source';
 
 async function startListener() {
   let backoff = 1000;

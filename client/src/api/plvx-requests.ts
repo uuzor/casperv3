@@ -33,15 +33,16 @@ export interface Match {
 }
 
 export interface Bet {
-  bet_id: string;
+  bet_id: number;
   user: string;
   match_id: number;
-  predicted_result: 'HomeWin' | 'Draw' | 'AwayWin';
+  predicted_result: number; // 0 = HomeWin, 1 = Draw, 2 = AwayWin
   amount: string;
-  odds: string;
+  odds?: string;
   is_settled: boolean;
-  is_won: boolean;
-  payout: string;
+  has_won: boolean;
+  payout?: string;
+  match?: Match; // Optional populated match data
 }
 
 export interface Badge {
@@ -197,18 +198,15 @@ export const getBet = async (betId: string): Promise<Bet> => {
 };
 
 /**
- * Get user's bets (requires filtering on client side or new endpoint)
+ * Get user's bets
  */
-export const getUserBets = async (userAddress: string, matchId?: number): Promise<Bet[]> => {
-  // If matchId is provided, fetch bets for that match and filter
-  if (matchId) {
-    const bets = await getMatchBets(matchId);
-    return bets.filter((bet) => bet.user.toLowerCase() === userAddress.toLowerCase());
+export const getUserBets = async (userAddress: string): Promise<Bet[]> => {
+  const res = await fetch(`${API_URL}/premier/users/${userAddress}/bets`);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch user bets: ${res.statusText}`);
   }
-
-  // TODO: Add a dedicated endpoint for user bets in the backend
-  // For now, this is a placeholder
-  throw new Error('Getting all user bets requires a dedicated backend endpoint');
+  const json: ApiListResponse<Bet> = await res.json();
+  return json.data;
 };
 
 // ==================== BADGE ENDPOINTS ====================
